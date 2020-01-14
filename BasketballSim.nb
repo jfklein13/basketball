@@ -1,0 +1,1158 @@
+(* Content-type: application/vnd.wolfram.mathematica *)
+
+(*** Wolfram Notebook File ***)
+(* http://www.wolfram.com/nb *)
+
+(* CreatedBy='Mathematica 12.0' *)
+
+(*CacheID: 234*)
+(* Internal cache information:
+NotebookFileLineBreakTest
+NotebookFileLineBreakTest
+NotebookDataPosition[       158,          7]
+NotebookDataLength[     50077,       1150]
+NotebookOptionsPosition[     44698,       1068]
+NotebookOutlinePosition[     45040,       1083]
+CellTagsIndexPosition[     44997,       1080]
+WindowFrame->Normal*)
+
+(* Beginning of Notebook Content *)
+Notebook[{
+
+Cell[CellGroupData[{
+Cell["Basketball Simulation", "Title",
+ CellChangeTimes->{{3.7873435655796185`*^9, 
+  3.7873435691209726`*^9}},ExpressionUUID->"09627fbd-004d-48a5-a82b-\
+7b1640d10e73"],
+
+Cell["\<\
+Even though basketball is a very fast moving game, you can model it as a \
+series of turns, or possessions, each with the following outcomes:\
+\>", "Text",
+ CellChangeTimes->{{3.7873435526193223`*^9, 
+  3.7873436433443937`*^9}},ExpressionUUID->"39dab510-938a-4068-9b49-\
+7f195bf51254"],
+
+Cell[CellGroupData[{
+
+Cell["time of possession", "Item",
+ CellChangeTimes->{{3.787343644674527*^9, 3.787343661660226*^9}, 
+   3.787637307196866*^9},ExpressionUUID->"46771aa8-12fd-486f-a4a6-\
+79474bee2f7c"],
+
+Cell["result of possession:", "Item",
+ CellChangeTimes->{{3.7873435354796085`*^9, 3.787343544554516*^9}, {
+  3.7873436689319525`*^9, 3.7873437100010595`*^9}, {3.787344796528759*^9, 
+  3.7873447990120134`*^9}},ExpressionUUID->"fe793e54-cd3f-401b-a246-\
+d2aafe74008d"],
+
+Cell[CellGroupData[{
+
+Cell["field goal and/or free throws", "Subitem",
+ CellChangeTimes->{{3.7873435354796085`*^9, 3.787343544554516*^9}, {
+  3.7873436689319525`*^9, 3.787343758725931*^9}, {3.7876373443548584`*^9, 
+  3.7876373614978504`*^9}},ExpressionUUID->"f9b367a5-1ff4-41ef-9585-\
+a94d089f5c8a"],
+
+Cell["missed shot", "Subitem",
+ CellChangeTimes->{{3.787343964385495*^9, 3.7873439798890452`*^9}, {
+  3.787344050333089*^9, 
+  3.787344051132169*^9}},ExpressionUUID->"8a283a2a-feba-4451-960e-\
+ae9d6c33939f"],
+
+Cell["game clock expires for the current period", "Subitem",
+ CellChangeTimes->{{3.787344022131269*^9, 
+  3.787344037803836*^9}},ExpressionUUID->"e35632a7-c8ff-4e99-9660-\
+f68ccb1a96fa"],
+
+Cell["turnover", "Subitem",
+ CellChangeTimes->{{3.7873435354796085`*^9, 3.787343544554516*^9}, {
+  3.7873436689319525`*^9, 3.787343728801939*^9}, {3.7873437737654347`*^9, 
+  3.7873437772087793`*^9}},ExpressionUUID->"1a3dfb1b-a660-4052-abf7-\
+862ded65e220"]
+}, Open  ]]
+}, Open  ]],
+
+Cell["\<\
+Since missed shot attempts with an offensive rebound are important, we view a \
+missed shot as ending a possession, but depending on who gets the rebound, \
+the subsequent possession could be for the same team with the previous \
+possession.\
+\>", "Text",
+ CellChangeTimes->{{3.7873438871247697`*^9, 3.78734395933899*^9}, {
+  3.7873440471277685`*^9, 
+  3.7873441205541105`*^9}},ExpressionUUID->"a52cb317-40fd-4ac1-8f40-\
+40e49fa87fee"],
+
+Cell[CellGroupData[{
+
+Cell["Model of Possession", "Section",
+ CellChangeTimes->{{3.787344870519555*^9, 
+  3.7873448734266825`*^9}},ExpressionUUID->"828ed67b-6b7f-4d43-abd1-\
+c41b53263f97"],
+
+Cell["Here is a model of a typical possession:", "Text",
+ CellChangeTimes->{{3.7873445136334143`*^9, 
+  3.78734452159021*^9}},ExpressionUUID->"c57a550f-23bf-480f-a36d-\
+9cdab6d0f5ae"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[
+ RowBox[{"possession", "=", 
+  RowBox[{"<|", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"\"\<Team\>\"", "\[Rule]", "\"\<Home\>\""}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"\"\<Start\>\"", "\[Rule]", 
+     RowBox[{"{", 
+      RowBox[{"20", ",", "0"}], "}"}]}], ",", "\[IndentingNewLine]", 
+    RowBox[{"\"\<Elapsed\>\"", "\[Rule]", 
+     TemplateBox[{"8.4","\"s\"","seconds","\"Seconds\""},
+      "Quantity"]}], ",", "\[IndentingNewLine]", 
+    RowBox[{"\"\<Result\>\"", "\[Rule]", " ", 
+     RowBox[{"MissedShot", "[", 
+      RowBox[{"\"\<JumpShot\>\"", ",", "12"}], "]"}]}]}], 
+   "\[IndentingNewLine]", "|>"}]}]], "Input",
+ CellChangeTimes->{{3.787344473746426*^9, 3.787344630655115*^9}, {
+  3.7873454776989727`*^9, 3.7873454828639727`*^9}, {3.7873456344979725`*^9, 
+  3.7873456448849726`*^9}, {3.7873456982669725`*^9, 3.787345709473973*^9}, {
+  3.7876426506385803`*^9, 
+  3.7876426682193384`*^9}},ExpressionUUID->"c0114508-92c6-45a5-806b-\
+59fe0a466e22"],
+
+Cell[BoxData[
+ RowBox[{"\[LeftAssociation]", 
+  RowBox[{
+   RowBox[{"\<\"Team\"\>", "\[Rule]", "\<\"Home\"\>"}], ",", 
+   RowBox[{"\<\"Start\"\>", "\[Rule]", 
+    RowBox[{"{", 
+     RowBox[{"20", ",", "0"}], "}"}]}], ",", 
+   RowBox[{"\<\"Elapsed\"\>", "\[Rule]", 
+    TemplateBox[{"8.4`","\"s\"","seconds","\"Seconds\""},
+     "Quantity"]}], ",", 
+   RowBox[{"\<\"Result\"\>", "\[Rule]", 
+    RowBox[{"MissedShot", "[", 
+     RowBox[{"\<\"JumpShot\"\>", ",", "12"}], "]"}]}]}], 
+  "\[RightAssociation]"}]], "Output",
+ CellChangeTimes->{3.787345711301973*^9, 3.787624257502287*^9, 
+  3.78763873992253*^9, 3.7876426701135283`*^9, 3.787857018297206*^9},
+ CellLabel->"Out[1]=",ExpressionUUID->"a0d6e07c-c9d0-4053-8c68-88488b31e4dd"]
+}, Open  ]],
+
+Cell["\<\
+Notice how the team and the player are identified: the teams by constant \
+strings, either \[OpenCurlyDoubleQuote]Home\[CloseCurlyDoubleQuote] or \
+\[OpenCurlyDoubleQuote]Away\[CloseCurlyDoubleQuote], and the players by their \
+uniform number. This way of using normalized data allows the information \
+about the actual teams and players to be stored in just one place.\
+\>", "Text",
+ CellChangeTimes->{{3.787344635940644*^9, 
+  3.7873447752305717`*^9}},ExpressionUUID->"51d97610-3e65-479a-a402-\
+3c978e5dd9c1"],
+
+Cell[CellGroupData[{
+
+Cell["Model of possession results", "Subsection",
+ CellChangeTimes->{{3.7873448626489167`*^9, 
+  3.7873448666547146`*^9}},ExpressionUUID->"46fd3538-1b93-45aa-8f35-\
+dfc1bb010acc"],
+
+Cell["\<\
+Here are more details about how the different results can be modeled:\
+\>", "Text",
+ CellChangeTimes->{{3.7873448877303905`*^9, 
+  3.7873449039005375`*^9}},ExpressionUUID->"9359a525-85a9-4146-b62c-\
+baae1397865e"],
+
+Cell["\<\
+A made field goal is represented as an expression with the shot type and the \
+number of player attempting the shot:\
+\>", "Text",
+ CellChangeTimes->{{3.787345212380639*^9, 3.787345213849492*^9}, {
+  3.7873453575511203`*^9, 3.787345369671908*^9}, {3.787639719078822*^9, 
+  3.787639721908822*^9}},ExpressionUUID->"30e25c5d-65ad-4432-9260-\
+e738da3f9615"],
+
+Cell[BoxData[
+ RowBox[{"Score", "[", 
+  RowBox[{"\"\<JumpShot\>\"", ",", "2"}], "]"}]], "Input",
+ CellChangeTimes->{{3.787345329628913*^9, 3.7873453418706884`*^9}, {
+  3.787345387128973*^9, 3.787345393808973*^9}, {3.7876398326058226`*^9, 
+  3.7876398337068224`*^9}},ExpressionUUID->"33348280-705c-4905-a00f-\
+1133ad526ed8"],
+
+Cell["\<\
+The types of shots can be extended but can include \
+\[OpenCurlyDoubleQuote]JumpShot\[CloseCurlyDoubleQuote], \
+\[OpenCurlyDoubleQuote]3PointJumpShot\[CloseCurlyDoubleQuote],\
+\[OpenCurlyDoubleQuote]Layup\[CloseCurlyDoubleQuote], and \
+\[OpenCurlyDoubleQuote]Dunk\[CloseCurlyDoubleQuote].\
+\>", "Text",
+ CellChangeTimes->{{3.7873452321436625`*^9, 3.7873452708877873`*^9}, {
+  3.7873453028775883`*^9, 3.787345305388337*^9}, {3.7876397742218227`*^9, 
+  3.7876398245418224`*^9}},ExpressionUUID->"f72c5818-0ba7-42d0-9d22-\
+4b8e4228172b"],
+
+Cell["A missed shot is similar to a score:", "Text",
+ CellChangeTimes->{{3.787345320645811*^9, 3.7873453278790874`*^9}, {
+  3.7876397301738224`*^9, 
+  3.7876397398368225`*^9}},ExpressionUUID->"e79d5412-f192-4479-8b1f-\
+a21f3bb47091"],
+
+Cell[BoxData[
+ RowBox[{"MissedShot", "[", 
+  RowBox[{"\"\<Layup\>\"", ",", "6"}], "]"}]], "Input",
+ CellChangeTimes->{{3.7873452161222644`*^9, 3.7873452298468924`*^9}, {
+  3.787345347082167*^9, 
+  3.7873453534865265`*^9}},ExpressionUUID->"4626798f-4a9d-4a23-a2e9-\
+bcc27bd20da5"],
+
+Cell["\<\
+Other results, such as turnovers, can be added to this model in a similar \
+fashion.\
+\>", "Text",
+ CellChangeTimes->{{3.788026604415684*^9, 
+  3.7880266477204943`*^9}},ExpressionUUID->"7c2cb354-8e74-4c2c-b1e1-\
+96f30161cab1"]
+}, Open  ]]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Model of Game State", "Section",
+ CellChangeTimes->{{3.7873471334719725`*^9, 
+  3.7873471356959724`*^9}},ExpressionUUID->"3e46c7ae-c1d4-4569-8226-\
+13e9c37f9b4c"],
+
+Cell["Here is a typical game state:", "Text",
+ CellChangeTimes->{{3.787347137576973*^9, 
+  3.7873471737999725`*^9}},ExpressionUUID->"57dea718-54fd-4bd0-9dc2-\
+7c2af6506d52"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"initialGameState", "=", 
+   RowBox[{"<|", "\[IndentingNewLine]", 
+    RowBox[{
+     RowBox[{"\"\<Score\>\"", "\[Rule]", 
+      RowBox[{"<|", 
+       RowBox[{
+        RowBox[{"\"\<Home\>\"", "\[Rule]", "0"}], ",", 
+        RowBox[{"\"\<Away\>\"", "\[Rule]", "0"}]}], "|>"}]}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"\"\<Period\>\"", "\[Rule]", "1"}], ",", "\[IndentingNewLine]", 
+     RowBox[{"\"\<PeriodClock\>\"", "\[Rule]", 
+      RowBox[{"{", 
+       RowBox[{"20", ",", "0"}], "}"}]}], ",", "\[IndentingNewLine]", 
+     RowBox[{"\"\<Possession\>\"", "\[Rule]", "\"\<Away\>\""}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"\"\<PossessionArrow\>\"", "\[Rule]", "\"\<Home\>\""}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"\"\<PeriodsInGame\>\"", "\[Rule]", "2"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"\"\<MinutesInPeriod\>\"", "\[Rule]", "20"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"\"\<MinutesInOvertime\>\"", "\[Rule]", "5"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"\"\<PossessionHistory\>\"", "\[Rule]", " ", 
+      RowBox[{"<|", "|>"}]}]}], "\[IndentingNewLine]", "|>"}]}], 
+  ";"}]], "Input",
+ CellChangeTimes->{{3.7873471522199726`*^9, 3.787347207904973*^9}, {
+   3.7874026816915298`*^9, 3.7874026818225036`*^9}, {3.7874033940208807`*^9, 
+   3.7874034230218806`*^9}, {3.7874046150928802`*^9, 
+   3.7874046388818808`*^9}, {3.7874047673008804`*^9, 
+   3.7874047770748806`*^9}, {3.7874051351898804`*^9, 3.787405150973881*^9}, 
+   3.7874055949808807`*^9, {3.787405683709881*^9, 3.787405690386881*^9}, {
+   3.7874125609543695`*^9, 3.7874125643053694`*^9}, {3.7876381320777516`*^9, 
+   3.787638135986142*^9}, {3.7876420022457476`*^9, 3.787642074267949*^9}, {
+   3.7876437222304106`*^9, 3.7876437231084104`*^9}, {3.7876461114274054`*^9, 
+   3.787646123148405*^9}, {3.787857071636257*^9, 3.7878570728333254`*^9}, {
+   3.787859492196705*^9, 3.787859500790197*^9}},
+ CellLabel->"In[4]:=",ExpressionUUID->"8a0a0570-b58a-487b-8e54-34e093b4fc20"],
+
+Cell["\<\
+We handle the difference in period structure between different leagues and \
+levels of play, from junior high school to pro, where college men\
+\[CloseCurlyQuote]s uses two 20 minute halves, and others use four quarters \
+of different lengths.\
+\>", "Text",
+ CellChangeTimes->{{3.787403427367881*^9, 3.787403444985881*^9}, {
+  3.7874040111868806`*^9, 3.7874040168078804`*^9}, {3.787404348853881*^9, 
+  3.787404477077881*^9}},ExpressionUUID->"844a7302-4537-4123-b077-\
+0cd8d57334d6"],
+
+Cell[TextData[{
+ "The period number uses simple integers for the periods in a regulation \
+game, or ",
+ StyleBox["Final", "MR"],
+ " when the game is over. When overtime is needed, the period becomes an ",
+ StyleBox["Overtime", "MR"],
+ " expression with the overtime period as its argument. Here is a \
+representation of a second overtime period:"
+}], "Text",
+ CellChangeTimes->{{3.7874046699478807`*^9, 3.7874047368578806`*^9}, {
+  3.7874052652818804`*^9, 
+  3.7874052719348803`*^9}},ExpressionUUID->"885cc713-165c-4082-86d4-\
+dd2eddf80e36"],
+
+Cell[BoxData[
+ RowBox[{"Overtime", "[", "2", "]"}]], "Input",
+ CellChangeTimes->{{3.7874047376028805`*^9, 3.7874047400088806`*^9}, 
+   3.788028181914735*^9},ExpressionUUID->"780c1ce9-65bf-4e5c-b82d-\
+abb3d6ff25bd"],
+
+Cell["\<\
+The period clock is divided into a pair of minutes and seconds for ease of \
+display.\
+\>", "Text",
+ CellChangeTimes->{{3.787404484070881*^9, 
+  3.7874045163118806`*^9}},ExpressionUUID->"ff84d2b5-797d-4519-94b7-\
+402f2cbf93d1"],
+
+Cell["\<\
+The possession history accumulates the series of plays in the game. It is \
+structured as an association from the period number\
+\>", "Text",
+ CellChangeTimes->{{3.787404641749881*^9, 
+  3.7874046644228806`*^9}},ExpressionUUID->"772f606c-4297-4a74-a455-\
+05cffee65db5"],
+
+Cell["We can ask if the game is over:", "Text",
+ CellChangeTimes->{{3.787638293384881*^9, 
+  3.7876383197335153`*^9}},ExpressionUUID->"ced0dcea-5eca-46ab-94bf-\
+46d8fef5446e"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"gameIsOverQ", "[", "gs_", "]"}], ":=", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{
+     RowBox[{"periodClockSeconds", "[", "gs", "]"}], "\[LessEqual]", "0.0"}], 
+    " ", "&&", " ", 
+    RowBox[{"(", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"gs", "[", "\"\<Period\>\"", "]"}], "===", 
+       RowBox[{"gs", "[", "\"\<PeriodsInGame\>\"", "]"}]}], "||", 
+      RowBox[{"MatchQ", "[", 
+       RowBox[{
+        RowBox[{"gs", "[", "\"\<Period\>\"", "]"}], ",", 
+        RowBox[{"Final", "|", "_Overtime"}]}], "]"}]}], ")"}], " ", "&&", " ", 
+    RowBox[{"UnsameQ", "@@", 
+     RowBox[{"Values", "[", 
+      RowBox[{"gs", "[", "\"\<Score\>\"", "]"}], "]"}]}]}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"periodClockSeconds", "[", 
+    RowBox[{"gs_", "?", "AssociationQ"}], "]"}], ":=", 
+   RowBox[{"periodClockSeconds", "[", 
+    RowBox[{"gs", "[", "\"\<PeriodClock\>\"", "]"}], "]"}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"periodClockSeconds", "[", 
+   RowBox[{"{", 
+    RowBox[{"min_", ",", "sec_"}], "}"}], "]"}], ":=", 
+  RowBox[{
+   RowBox[{"min", "*", "60"}], "+", "sec"}]}]}], "Input",
+ CellChangeTimes->{{3.787638110846629*^9, 3.7876382760701494`*^9}, {
+  3.7876383447150135`*^9, 3.787638394039945*^9}, {3.7878586307844353`*^9, 
+  3.7878586312764635`*^9}, {3.787858665401415*^9, 3.78785868105031*^9}, {
+  3.787860970915283*^9, 3.7878609737054424`*^9}},
+ CellLabel->"In[5]:=",ExpressionUUID->"1d307246-30e1-409d-b6e4-fe1c81290339"]
+}, Open  ]],
+
+Cell[CellGroupData[{
+
+Cell["Tracking a game", "Section",
+ CellChangeTimes->{{3.787346761798973*^9, 
+  3.7873467640799727`*^9}},ExpressionUUID->"17ac04d7-2b75-4b25-adca-\
+12434e40e3af"],
+
+Cell["\<\
+We would like to drive the game with a function that takes the current game \
+state and computes the result of a possession. The usage of the function g \
+will be this:\
+\>", "Text",
+ CellChangeTimes->{{3.7873470172719727`*^9, 3.787347041036973*^9}, {
+  3.787347091242973*^9, 3.7873471016089725`*^9}, {3.7874026976873302`*^9, 
+  3.787402714514964*^9}, {3.787637875565245*^9, 
+  3.7876378988282223`*^9}},ExpressionUUID->"fc82eacd-4423-4a9b-b26a-\
+58c6924c8151"],
+
+Cell[BoxData[
+ RowBox[{"p", " ", "=", " ", 
+  RowBox[{"g", "[", "gamestate", "]"}]}]], "Input",
+ CellChangeTimes->{{3.7873471027049727`*^9, 3.787347123341973*^9}, {
+  3.787402724915883*^9, 
+  3.7874027257147236`*^9}},ExpressionUUID->"27e5b2e2-fd87-4c0b-8ae7-\
+86e5c312b1b7"],
+
+Cell["Where p is the result of the possession.", "Text",
+ CellChangeTimes->{{3.7874027292230215`*^9, 
+  3.7874027442178802`*^9}},ExpressionUUID->"50c5f287-9117-4801-9745-\
+cb7a659dae0a"],
+
+Cell["\<\
+Once we get the result of the possession, we need another function that \
+produces a new game state, applying the result of the possession.\
+\>", "Text",
+ CellChangeTimes->{{3.787638859871524*^9, 
+  3.7876388856731033`*^9}},ExpressionUUID->"821fc3e6-c4ee-4de5-b694-\
+b9b876beecd3"],
+
+Cell["\<\
+We can start simple, handling the two main interesting possession results of \
+a missed shot and a made field goal:\
+\>", "Text",
+ CellChangeTimes->{{3.7876389443289685`*^9, 
+  3.7876389669812336`*^9}},ExpressionUUID->"ff11f5da-8139-4313-be67-\
+49e25291b274"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"updateGameState", "[", 
+   RowBox[{"gs_", ",", 
+    RowBox[{"p", ":", 
+     RowBox[{"KeyValuePattern", "[", 
+      RowBox[{"{", 
+       RowBox[{
+        RowBox[{"\"\<Team\>\"", "\[Rule]", "team_"}], ",", 
+        RowBox[{"\"\<Elapsed\>\"", "\[Rule]", "telapsed_"}]}], "}"}], 
+      "]"}]}]}], "]"}], ":=", "\[IndentingNewLine]", 
+  RowBox[{"With", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"newClockAndPeriod", "=", 
+      RowBox[{"advanceGameClockAndPeriod", "[", 
+       RowBox[{"gs", ",", "telapsed"}], "]"}]}], "}"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Join", "[", 
+     RowBox[{
+     "gs", ",", "\[IndentingNewLine]", "newClockAndPeriod", ",", 
+      "\[IndentingNewLine]", 
+      RowBox[{"<|", "\[IndentingNewLine]", 
+       RowBox[{
+        RowBox[{"\"\<Possession\>\"", "\[Rule]", 
+         RowBox[{"Replace", "[", 
+          RowBox[{"team", ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"\"\<Home\>\"", "\[Rule]", "\"\<Away\>\""}], ",", 
+             RowBox[{"\"\<Away\>\"", "\[Rule]", "\"\<Home\>\""}]}], "}"}]}], 
+          "]"}]}], ",", "\[IndentingNewLine]", 
+        RowBox[{"\"\<Score\>\"", "\[Rule]", 
+         RowBox[{"updateScore", "[", 
+          RowBox[{"gs", ",", 
+           RowBox[{"p", "[", "\"\<Result\>\"", "]"}]}], "]"}]}], ",", 
+        "\[IndentingNewLine]", 
+        RowBox[{"\"\<PossessionHistory\>\"", "\[Rule]", "\[IndentingNewLine]", 
+         RowBox[{"With", "[", 
+          RowBox[{
+           RowBox[{"{", 
+            RowBox[{"history", "=", 
+             RowBox[{"gs", "[", "\"\<PossessionHistory\>\"", "]"}]}], "}"}], 
+           ",", "\[IndentingNewLine]", 
+           RowBox[{"Append", "[", 
+            RowBox[{"history", ",", 
+             RowBox[{
+              RowBox[{"gs", "[", "\"\<Period\>\"", "]"}], "\[Rule]", 
+              RowBox[{"Append", "[", 
+               RowBox[{
+                RowBox[{"Lookup", "[", 
+                 RowBox[{"history", ",", 
+                  RowBox[{"gs", "[", "\"\<Period\>\"", "]"}], ",", 
+                  RowBox[{"{", "}"}]}], "]"}], ",", "p"}], "]"}]}]}], "]"}]}],
+           "\[IndentingNewLine]", "]"}]}]}], "\[IndentingNewLine]", "|>"}]}], 
+     "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", "]"}]}]], "Input",
+ CellChangeTimes->{{3.787346935692973*^9, 3.787346977572973*^9}, {
+   3.787347045577973*^9, 3.7873470879649725`*^9}, {3.7874032975628805`*^9, 
+   3.7874033760248804`*^9}, {3.787404545242881*^9, 3.7874046043128805`*^9}, {
+   3.7874047510878806`*^9, 3.7874047608388805`*^9}, {3.7874049357188807`*^9, 
+   3.7874049846528807`*^9}, {3.7874050577668805`*^9, 
+   3.7874051250108805`*^9}, {3.787405160695881*^9, 3.7874052484298806`*^9}, {
+   3.7874052968378806`*^9, 3.7874053168898807`*^9}, {3.7874053510628805`*^9, 
+   3.7874053531918807`*^9}, {3.7874055543838806`*^9, 
+   3.7874055644218807`*^9}, {3.7874056301668806`*^9, 
+   3.7874056552538805`*^9}, {3.7874113857093697`*^9, 
+   3.7874114042543697`*^9}, {3.7874114600953693`*^9, 
+   3.7874115409733696`*^9}, {3.7874116900813694`*^9, 3.78741169698337*^9}, {
+   3.7874117586263695`*^9, 3.7874117691023693`*^9}, 3.787623994148954*^9, {
+   3.7876249806455936`*^9, 3.78762504301083*^9}, {3.787625102781806*^9, 
+   3.787625145444072*^9}, {3.787625195581085*^9, 3.7876252029158187`*^9}, {
+   3.7876252402205486`*^9, 3.78762524263279*^9}, {3.7876389967762127`*^9, 
+   3.7876389972152567`*^9}, {3.7876390289134264`*^9, 
+   3.7876390526708016`*^9}, {3.7876391483913727`*^9, 3.787639149134447*^9}, {
+   3.7876391816977034`*^9, 3.787639248623395*^9}, {3.787639284708003*^9, 
+   3.7876393145879908`*^9}, {3.787639347454277*^9, 3.787639363322824*^9}, {
+   3.787639413639295*^9, 3.7876394425361843`*^9}, {3.7876395281467447`*^9, 
+   3.7876395449604263`*^9}, {3.7876395752784576`*^9, 
+   3.7876395912190514`*^9}, {3.7876396257855077`*^9, 3.787639665770506*^9}, {
+   3.7876398785768223`*^9, 3.7876400618248224`*^9}, {3.7876401153488226`*^9, 
+   3.787640136906822*^9}, {3.7876402744288225`*^9, 3.787640275802822*^9}, {
+   3.78764095345887*^9, 3.787641054176941*^9}, {3.7876410885443773`*^9, 
+   3.7876411043759604`*^9}, {3.7876411440499277`*^9, 3.787641201731695*^9}, {
+   3.787641301225643*^9, 3.787641351465667*^9}, {3.7876413883603563`*^9, 
+   3.787641390729593*^9}, {3.7876418365226173`*^9, 3.7876418380606174`*^9}, {
+   3.787642136173139*^9, 3.787642140731595*^9}, {3.7876425789414115`*^9, 
+   3.787642580463564*^9}, {3.787643287574268*^9, 3.7876433967901883`*^9}, {
+   3.7876434901794105`*^9, 3.7876435259924107`*^9}, {3.7876436003344107`*^9, 
+   3.7876436946644106`*^9}, {3.787645526574405*^9, 3.7876455673854055`*^9}, {
+   3.7876456061324053`*^9, 3.787645607301405*^9}, {3.7876458226114054`*^9, 
+   3.787645836723405*^9}},
+ CellLabel->"In[8]:=",ExpressionUUID->"deecce42-bfb5-46bd-845a-30fe1368d15b"],
+
+Cell["\<\
+The game clock counts down, so to advance the game clock we subtract the time \
+ spent in the possession, making sure it never goes negative, returning it in \
+the {minute, second} format where seconds are rounded to the nearest tenth:\
+\>", "Text",
+ CellChangeTimes->{{3.787640285347822*^9, 
+  3.7876403933518653`*^9}},ExpressionUUID->"47cbb70f-6dd6-44f2-b490-\
+274352935bd8"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"advanceGameClockAndPeriod", "[", 
+    RowBox[{"gs_", ",", 
+     RowBox[{"tseconds_", "?", "QuantityQ"}]}], "]"}], ":=", 
+   "\[IndentingNewLine]", 
+   RowBox[{"With", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"newclock", "=", 
+       RowBox[{"advanceGameClock", "[", 
+        RowBox[{"gs", ",", "tseconds"}], "]"}]}], "}"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"If", "[", 
+      RowBox[{
+       RowBox[{
+        RowBox[{"periodClockSeconds", "[", "newclock", "]"}], ">", "0"}], ",",
+        "\[IndentingNewLine]", 
+       RowBox[{"(*", " ", 
+        RowBox[{
+         RowBox[{"there", "'"}], "s", " ", "still", " ", "time", " ", "on", 
+         " ", "the", " ", "clock"}], " ", "*)"}], "\[IndentingNewLine]", 
+       RowBox[{"Append", "[", 
+        RowBox[{
+         RowBox[{"KeyTake", "[", 
+          RowBox[{"gs", ",", "\"\<Period\>\""}], "]"}], ",", 
+         RowBox[{"\"\<PeriodClock\>\"", "\[Rule]", "newclock"}]}], "]"}], ",",
+        "\[IndentingNewLine]", 
+       RowBox[{"(*", " ", 
+        RowBox[{
+         RowBox[{"clock", " ", "has", " ", "expired"}], ",", " ", 
+         RowBox[{"advance", " ", "the", " ", "period"}]}], " ", "*)"}], 
+       "\[IndentingNewLine]", 
+       RowBox[{"advancePeriod", "[", 
+        RowBox[{"Append", "[", 
+         RowBox[{"gs", ",", 
+          RowBox[{"\"\<PeriodClock\>\"", "\[Rule]", "newclock"}]}], "]"}], 
+        "]"}]}], "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", 
+    "]"}]}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"advanceGameClock", "[", 
+    RowBox[{"gs_", ",", 
+     RowBox[{"tseconds_", "?", "QuantityQ"}]}], "]"}], ":=", 
+   "\[IndentingNewLine]", 
+   RowBox[{"toMinutesSeconds", "[", 
+    RowBox[{"Max", "[", 
+     RowBox[{
+      RowBox[{
+       RowBox[{"periodClockSeconds", "[", "gs", "]"}], "-", 
+       RowBox[{"QuantityMagnitude", "[", "tseconds", "]"}]}], ",", "0"}], 
+     "]"}], "]"}]}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"toMinutesSeconds", "[", "tseconds_", "]"}], ":=", 
+  "\[IndentingNewLine]", 
+  RowBox[{"With", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{"t", "=", 
+      RowBox[{"Round", "[", 
+       RowBox[{"tseconds", ",", "0.1"}], "]"}]}], "}"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"Floor", "[", 
+       RowBox[{"t", "/", "60."}], "]"}], ",", 
+      RowBox[{"Mod", "[", 
+       RowBox[{"t", ",", "60."}], "]"}]}], "}"}]}], "\[IndentingNewLine]", 
+   "]"}]}]}], "Input",
+ CellChangeTimes->{{3.787346935692973*^9, 3.787346977572973*^9}, {
+   3.787347045577973*^9, 3.7873470879649725`*^9}, {3.7874032975628805`*^9, 
+   3.7874033760248804`*^9}, {3.787404545242881*^9, 3.7874046043128805`*^9}, {
+   3.7874047510878806`*^9, 3.7874047608388805`*^9}, {3.7874049357188807`*^9, 
+   3.7874049846528807`*^9}, {3.7874050577668805`*^9, 
+   3.7874051250108805`*^9}, {3.787405160695881*^9, 3.7874052484298806`*^9}, {
+   3.7874052968378806`*^9, 3.7874053168898807`*^9}, {3.7874053510628805`*^9, 
+   3.7874053531918807`*^9}, {3.7874055543838806`*^9, 
+   3.7874055644218807`*^9}, {3.7874056301668806`*^9, 
+   3.7874056552538805`*^9}, {3.7874113857093697`*^9, 
+   3.7874114042543697`*^9}, {3.7874114600953693`*^9, 
+   3.7874115409733696`*^9}, {3.7874116900813694`*^9, 3.78741169698337*^9}, {
+   3.7874117586263695`*^9, 3.7874117691023693`*^9}, 3.787623994148954*^9, {
+   3.7876249806455936`*^9, 3.78762504301083*^9}, {3.787625102781806*^9, 
+   3.787625145444072*^9}, {3.787625195581085*^9, 3.7876252029158187`*^9}, {
+   3.7876252402205486`*^9, 3.78762524263279*^9}, {3.7876389967762127`*^9, 
+   3.7876389972152567`*^9}, {3.7876390289134264`*^9, 
+   3.7876390526708016`*^9}, {3.7876391483913727`*^9, 3.787639149134447*^9}, {
+   3.7876391816977034`*^9, 3.787639248623395*^9}, {3.787639284708003*^9, 
+   3.7876393145879908`*^9}, {3.787639347454277*^9, 3.787639363322824*^9}, {
+   3.787639413639295*^9, 3.7876394425361843`*^9}, {3.7876395281467447`*^9, 
+   3.7876395449604263`*^9}, {3.7876395752784576`*^9, 
+   3.7876395912190514`*^9}, {3.7876396257855077`*^9, 3.787639665770506*^9}, {
+   3.7876398785768223`*^9, 3.7876400618248224`*^9}, {3.7876401153488226`*^9, 
+   3.787640136906822*^9}, 3.7876402744288225`*^9, {3.787640401294659*^9, 
+   3.7876404021447444`*^9}, {3.7876420949490175`*^9, 3.787642126530175*^9}, {
+   3.7876452278983*^9, 3.7876453580863175`*^9}, 3.7876453918074055`*^9, 
+   3.7876457387774053`*^9, {3.787858626214174*^9, 3.7878586268012075`*^9}, {
+   3.787858660257121*^9, 3.7878586607071466`*^9}, {3.787859324757128*^9, 
+   3.78785936045317*^9}, {3.7878596788423805`*^9, 3.7878597095991397`*^9}, {
+   3.787859951180958*^9, 3.7878599525810375`*^9}},
+ CellLabel->"In[9]:=",ExpressionUUID->"093c3118-e3ba-4d71-abdf-8986e92ce028"],
+
+Cell["\<\
+To advanced the period, first determine if the game is over, and if not, use \
+pattern matching to follow the simple rules of advancing periods that flow \
+over into overtime or additional overtime periods:\
+\>", "Text",
+ CellChangeTimes->{{3.7876411863161535`*^9, 3.787641191852707*^9}, {
+  3.7876415522536173`*^9, 
+  3.787641604818617*^9}},ExpressionUUID->"a9112578-ed3b-43af-b478-\
+f32821d468c5"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{
+   RowBox[{"advancePeriod", "[", "gs_", "]"}], ":=", "\[IndentingNewLine]", 
+   RowBox[{"If", "[", 
+    RowBox[{
+     RowBox[{"gameIsOverQ", "[", "gs", "]"}], ",", "\[IndentingNewLine]", 
+     RowBox[{"<|", 
+      RowBox[{
+       RowBox[{"\"\<Period\>\"", "\[Rule]", "Final"}], ",", 
+       RowBox[{"\"\<PeriodClock\>\"", "\[Rule]", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "0"}], "}"}]}]}], "|>"}], ",", 
+     "\[IndentingNewLine]", 
+     RowBox[{"With", "[", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{"period", "=", 
+         RowBox[{"advancePeriod", "[", 
+          RowBox[{
+           RowBox[{"gs", "[", "\"\<Period\>\"", "]"}], ",", 
+           RowBox[{"gs", "[", "\"\<PeriodsInGame\>\"", "]"}]}], "]"}]}], 
+        "}"}], ",", "\[IndentingNewLine]", 
+       RowBox[{"<|", 
+        RowBox[{
+         RowBox[{"\"\<Period\>\"", "\[Rule]", "period"}], ",", 
+         RowBox[{"\"\<PeriodClock\>\"", "\[Rule]", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"If", "[", 
+             RowBox[{
+              RowBox[{"IntegerQ", "[", "period", "]"}], ",", 
+              RowBox[{"gs", "[", "\"\<MinutesInPeriod\>\"", "]"}], ",", 
+              RowBox[{"gs", "[", "\"\<MinutesInOvertime\>\"", "]"}]}], "]"}], 
+            ",", "0"}], "}"}]}]}], "|>"}]}], "\[IndentingNewLine]", "]"}]}], 
+    "\[IndentingNewLine]", "]"}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"advancePeriod", "[", 
+   RowBox[{"n_Integer", ",", "ppg_"}], "]"}], ":=", 
+  RowBox[{"If", "[", 
+   RowBox[{
+    RowBox[{"n", "<", "ppg"}], ",", 
+    RowBox[{"n", "+", "1"}], ",", 
+    RowBox[{"Overtime", "[", "1", "]"}]}], "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"advancePeriod", "[", 
+   RowBox[{
+    RowBox[{"Overtime", "[", "n_", "]"}], ",", "_"}], "]"}], ":=", 
+  RowBox[{"Overtime", "[", 
+   RowBox[{"n", "+", "1"}], "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"advancePeriod", "[", 
+   RowBox[{"Final", ",", "_"}], "]"}], ":=", "Final"}]}], "Input",
+ CellChangeTimes->{{3.7876411924757695`*^9, 3.787641288233344*^9}, {
+  3.7876413430308237`*^9, 3.7876413451190324`*^9}, {3.7876413941059303`*^9, 
+  3.787641496988617*^9}, {3.787641630361617*^9, 3.7876416430156174`*^9}, {
+  3.7876454154814053`*^9, 3.7876454624934053`*^9}, {3.7878570845979986`*^9, 
+  3.7878570912803802`*^9}, {3.7878591568305235`*^9, 3.787859157541564*^9}, {
+  3.787859521969408*^9, 3.787859569410122*^9}, {3.787860067703622*^9, 
+  3.787860073850974*^9}},
+ CellLabel->"In[12]:=",ExpressionUUID->"1c0476e1-53f4-4c52-80b9-3a3c8f1810ab"],
+
+Cell["\<\
+Updating the score is straightforward, since only one possession outcome \
+affects the score, and we handle the point variation with a replacement rule \
+based on the shot type:\
+\>", "Text",
+ CellChangeTimes->{{3.7876404037649064`*^9, 3.787640418764406*^9}, {
+  3.787640467987328*^9, 
+  3.787640507096238*^9}},ExpressionUUID->"c9046f9e-a097-4a4d-88c2-\
+6b6fd8f75e54"],
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"updateScore", "[", 
+   RowBox[{"gs_", ",", 
+    RowBox[{"Score", "[", 
+     RowBox[{"type_", ",", "___"}], "]"}]}], "]"}], ":=", 
+  "\[IndentingNewLine]", 
+  RowBox[{"With", "[", 
+   RowBox[{
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"team", "=", 
+       RowBox[{"gs", "[", "\"\<Possession\>\"", "]"}]}], ",", 
+      RowBox[{"score", "=", 
+       RowBox[{"gs", "[", "\"\<Score\>\"", "]"}]}]}], "}"}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"Append", "[", 
+     RowBox[{"score", ",", 
+      RowBox[{"team", "\[Rule]", 
+       RowBox[{"(", 
+        RowBox[{
+         RowBox[{"score", "[", "team", "]"}], "+", 
+         RowBox[{"Replace", "[", 
+          RowBox[{"type", ",", 
+           RowBox[{"{", 
+            RowBox[{
+             RowBox[{"\"\<3PtJumpShot\>\"", "\[Rule]", "3"}], ",", 
+             RowBox[{"_", "\[Rule]", "2"}]}], "}"}]}], "]"}]}], ")"}]}]}], 
+     "]"}]}], "\[IndentingNewLine]", "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"updateScore", "[", 
+   RowBox[{"gs_", ",", "_"}], "]"}], ":=", 
+  RowBox[{"gs", "[", "\"\<Score\>\"", "]"}]}]}], "Input",
+ CellChangeTimes->{{3.787346935692973*^9, 3.787346977572973*^9}, {
+   3.787347045577973*^9, 3.7873470879649725`*^9}, {3.7874032975628805`*^9, 
+   3.7874033760248804`*^9}, {3.787404545242881*^9, 3.7874046043128805`*^9}, {
+   3.7874047510878806`*^9, 3.7874047608388805`*^9}, {3.7874049357188807`*^9, 
+   3.7874049846528807`*^9}, {3.7874050577668805`*^9, 
+   3.7874051250108805`*^9}, {3.787405160695881*^9, 3.7874052484298806`*^9}, {
+   3.7874052968378806`*^9, 3.7874053168898807`*^9}, {3.7874053510628805`*^9, 
+   3.7874053531918807`*^9}, {3.7874055543838806`*^9, 
+   3.7874055644218807`*^9}, {3.7874056301668806`*^9, 
+   3.7874056552538805`*^9}, {3.7874113857093697`*^9, 
+   3.7874114042543697`*^9}, {3.7874114600953693`*^9, 
+   3.7874115409733696`*^9}, {3.7874116900813694`*^9, 3.78741169698337*^9}, {
+   3.7874117586263695`*^9, 3.7874117691023693`*^9}, 3.787623994148954*^9, {
+   3.7876249806455936`*^9, 3.78762504301083*^9}, {3.787625102781806*^9, 
+   3.787625145444072*^9}, {3.787625195581085*^9, 3.7876252029158187`*^9}, {
+   3.7876252402205486`*^9, 3.78762524263279*^9}, {3.7876389967762127`*^9, 
+   3.7876389972152567`*^9}, {3.7876390289134264`*^9, 
+   3.7876390526708016`*^9}, {3.7876391483913727`*^9, 3.787639149134447*^9}, {
+   3.7876391816977034`*^9, 3.787639248623395*^9}, {3.787639284708003*^9, 
+   3.7876393145879908`*^9}, {3.787639347454277*^9, 3.787639363322824*^9}, {
+   3.787639413639295*^9, 3.7876394425361843`*^9}, {3.7876395281467447`*^9, 
+   3.7876395449604263`*^9}, {3.7876395752784576`*^9, 
+   3.7876395912190514`*^9}, {3.7876396257855077`*^9, 3.787639665770506*^9}, {
+   3.7876398785768223`*^9, 3.7876400618248224`*^9}, {3.7876401153488226`*^9, 
+   3.787640136906822*^9}, 3.7876402744288225`*^9, {3.787640401294659*^9, 
+   3.7876404535228815`*^9}},
+ CellLabel->"In[16]:=",ExpressionUUID->"f33c127b-862a-445f-b314-a7a0584d84e7"],
+
+Cell["\<\
+We can start with a simple-minded possession generation function that \
+randomly picks a miss or a made shot and runs a random amount of time off the \
+clock:\
+\>", "Text",
+ CellChangeTimes->{{3.78762399781332*^9, 3.787624063978936*^9}, {
+  3.787640642506778*^9, 
+  3.7876406643789654`*^9}},ExpressionUUID->"bcd91c0f-f6a7-462a-9fc2-\
+6928ce2d8409"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"generatePossession", "[", "gs_", "]"}], ":=", 
+  "\[IndentingNewLine]", 
+  RowBox[{"<|", "\[IndentingNewLine]", 
+   RowBox[{
+    RowBox[{"\"\<Team\>\"", "\[Rule]", 
+     RowBox[{"gs", "[", "\"\<Possession\>\"", "]"}]}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"\"\<Start\>\"", "\[Rule]", 
+     RowBox[{"gs", "[", "\"\<PeriodClock\>\"", "]"}]}], ",", 
+    "\[IndentingNewLine]", 
+    RowBox[{"\"\<Elapsed\>\"", "\[Rule]", 
+     RowBox[{"Quantity", "[", 
+      RowBox[{
+       RowBox[{"RandomReal", "[", 
+        RowBox[{"{", 
+         RowBox[{"0", ",", "35"}], "}"}], "]"}], ",", "\"\<Seconds\>\""}], 
+      "]"}]}], ",", 
+    RowBox[{"\"\<Result\>\"", "\[Rule]", 
+     RowBox[{"RandomChoice", "[", 
+      RowBox[{
+       RowBox[{"With", "[", 
+        RowBox[{
+         RowBox[{"{", 
+          RowBox[{"fgpct", "=", "0.4"}], "}"}], ",", 
+         RowBox[{"{", 
+          RowBox[{"fgpct", ",", 
+           RowBox[{"1.0", "-", "fgpct"}]}], "}"}]}], "]"}], "\[Rule]", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"Score", "[", 
+          RowBox[{"\"\<Jumper\>\"", ",", "1"}], "]"}], ",", 
+         RowBox[{"MissedShot", "[", 
+          RowBox[{"\"\<Jumper\>\"", ",", "2"}], "]"}]}], "}"}]}], "]"}]}]}], 
+   "\[IndentingNewLine]", "|>"}]}]], "Input",
+ CellChangeTimes->{{3.787624067626301*^9, 3.7876242367082076`*^9}, {
+  3.7876242778693233`*^9, 3.7876243776933045`*^9}, {3.7876244101785526`*^9, 
+  3.7876244748510194`*^9}, {3.7876251734508724`*^9, 3.787625186899217*^9}, {
+  3.7876406765951867`*^9, 3.787640682254752*^9}, {3.7876418787606173`*^9, 
+  3.7876418832796173`*^9}, {3.7876427042749434`*^9, 3.7876427119617124`*^9}},
+ CellLabel->"In[18]:=",ExpressionUUID->"2c42bfdf-696b-4498-b4aa-6e1cbb790745"],
+
+Cell["\<\
+We can now generate a single possession and then update the game state, to \
+arrive at a single function that takes a game state and returns the next game \
+state:\
+\>", "Text",
+ CellChangeTimes->{{3.787640699904517*^9, 3.7876407402295494`*^9}, {
+  3.7878585237253113`*^9, 
+  3.787858523956325*^9}},ExpressionUUID->"910eef16-2c45-4a84-8fee-\
+a2bd1ad460e9"],
+
+Cell[BoxData[
+ RowBox[{
+  RowBox[{"runPossession", "[", "gamestate_", "]"}], ":=", 
+  "\[IndentingNewLine]", 
+  RowBox[{"updateGameState", "[", 
+   RowBox[{"gamestate", ",", 
+    RowBox[{"generatePossession", "[", "gamestate", "]"}]}], "]"}]}]], "Input",
+ CellChangeTimes->{{3.787346935692973*^9, 3.787346977572973*^9}, {
+  3.787347045577973*^9, 3.7873470879649725`*^9}, {3.7874032975628805`*^9, 
+  3.7874033760248804`*^9}, {3.787404545242881*^9, 3.7874046043128805`*^9}, {
+  3.7874047510878806`*^9, 3.7874047608388805`*^9}, {3.7874049357188807`*^9, 
+  3.7874049846528807`*^9}, {3.7874050577668805`*^9, 3.7874051250108805`*^9}, {
+  3.787405160695881*^9, 3.7874052484298806`*^9}, {3.7874052968378806`*^9, 
+  3.7874053168898807`*^9}, {3.7874053510628805`*^9, 3.7874053531918807`*^9}, {
+  3.7874055543838806`*^9, 3.7874055644218807`*^9}, {3.7874056301668806`*^9, 
+  3.7874056552538805`*^9}, {3.7874113857093697`*^9, 3.7874114042543697`*^9}, {
+  3.7874114600953693`*^9, 3.7874115409733696`*^9}, {3.7874116900813694`*^9, 
+  3.78741169698337*^9}, {3.7874117586263695`*^9, 3.7874117691023693`*^9}, {
+  3.787623994148954*^9, 3.7876239957641153`*^9}},
+ CellLabel->"In[19]:=",ExpressionUUID->"3de35062-ce17-44fa-8b96-1b4ffbee1d59"],
+
+Cell["\<\
+Finally, we are ready to play. It is straightforward to update the core game \
+state, passing it the initial game state and continuing to call it until the \
+game is over:\
+\>", "Text",
+ CellChangeTimes->{{3.7874032069778805`*^9, 3.787403232780881*^9}, 
+   3.7874032908578806`*^9, {3.787637940561602*^9, 3.7876379665602016`*^9}, {
+   3.7876405948640146`*^9, 
+   3.787640600491577*^9}},ExpressionUUID->"b53d3500-7add-420c-8cc6-\
+fd27ba6f8e0d"],
+
+Cell[CellGroupData[{
+
+Cell[BoxData[{
+ RowBox[{
+  RowBox[{"gs", "=", "initialGameState"}], ";"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"Dynamic", "[", "\[IndentingNewLine]", 
+   RowBox[{"Grid", " ", "[", 
+    RowBox[{
+     RowBox[{"{", "\[IndentingNewLine]", 
+      RowBox[{
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"Dataset", "[", 
+          RowBox[{"<|", 
+           RowBox[{
+            RowBox[{"\"\<Away\>\"", "\[Rule]", 
+             RowBox[{"gs", "[", 
+              RowBox[{"\"\<Score\>\"", ",", "\"\<Away\>\""}], "]"}]}], ",", 
+            RowBox[{"\"\<Home\>\"", "\[Rule]", 
+             RowBox[{"gs", "[", 
+              RowBox[{"\"\<Score\>\"", ",", "\"\<Home\>\""}], "]"}]}], ",", 
+            RowBox[{"\"\<Clock\>\"", "\[Rule]", 
+             RowBox[{"viewClockAndPeriod", "[", "gs", "]"}]}], ",", 
+            RowBox[{"\"\<Last Play:\>\"", "\[Rule]", 
+             RowBox[{"Replace", "[", 
+              RowBox[{
+               RowBox[{"gs", "[", 
+                RowBox[{"\"\<PossessionHistory\>\"", ",", 
+                 RowBox[{"gs", "[", "\"\<Period\>\"", "]"}]}], "]"}], ",", 
+               RowBox[{"{", 
+                RowBox[{
+                 RowBox[{
+                  RowBox[{"{", 
+                   RowBox[{"___", ",", "p_"}], "}"}], "\[RuleDelayed]", 
+                  RowBox[{"viewPlay", "[", 
+                   RowBox[{"KeyTake", "[", 
+                    RowBox[{"p", ",", 
+                    RowBox[{"{", 
+                    RowBox[{"\"\<Team\>\"", ",", "\"\<Result\>\""}], "}"}]}], 
+                    "]"}], "]"}]}], ",", 
+                 RowBox[{"_", "\[RuleDelayed]", "\"\<\>\""}]}], "}"}]}], 
+              "]"}]}]}], "|>"}], "]"}], ",", "SpanFromLeft"}], "}"}], ",", 
+       "\[IndentingNewLine]", 
+       RowBox[{"{", 
+        RowBox[{
+         RowBox[{"Row", "[", 
+          RowBox[{"{", 
+           RowBox[{
+            RowBox[{"Button", "[", 
+             RowBox[{"\"\<Next Possession\>\"", ",", 
+              RowBox[{"gs", "=", 
+               RowBox[{"runPossession", "[", "gs", "]"}]}]}], "]"}], ",", 
+            RowBox[{"Button", "[", 
+             RowBox[{"\"\<+10 Possessions\>\"", ",", 
+              RowBox[{"Do", "[", 
+               RowBox[{
+                RowBox[{"gs", "=", 
+                 RowBox[{"runPossession", "[", "gs", "]"}]}], ",", 
+                RowBox[{"{", "10", "}"}]}], "]"}]}], "]"}]}], "}"}], "]"}], 
+         ",", 
+         RowBox[{"Button", "[", 
+          RowBox[{"\"\<New Game\>\"", ",", 
+           RowBox[{"gs", "=", "initialGameState"}]}], "]"}]}], "}"}]}], 
+      "\[IndentingNewLine]", "}"}], ",", 
+     RowBox[{"Alignment", "\[Rule]", "Left"}]}], "]"}], "\[IndentingNewLine]",
+    "]"}], "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"viewClockAndPeriod", "[", "gs_", "]"}], ":=", 
+   RowBox[{
+    RowBox[{"viewClock", "[", "gs", "]"}], "<>", "\"\< \>\"", "<>", 
+    RowBox[{"viewPeriod", "[", "gs", "]"}]}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"viewClock", "[", 
+    RowBox[{"gs_", "?", "AssociationQ"}], "]"}], ":=", "\[IndentingNewLine]", 
+   RowBox[{"With", "[", 
+    RowBox[{
+     RowBox[{"{", 
+      RowBox[{"fmt", "=", 
+       RowBox[{
+        RowBox[{"IntegerString", "[", 
+         RowBox[{"#", ",", "10", ",", "2"}], "]"}], "&"}]}], "}"}], ",", 
+     RowBox[{"StringJoin", "[", 
+      RowBox[{
+       RowBox[{"fmt", "@", 
+        RowBox[{"First", "[", 
+         RowBox[{"gs", "[", "\"\<PeriodClock\>\"", "]"}], "]"}]}], ",", 
+       "\"\<:\>\"", ",", 
+       RowBox[{"fmt", "@", 
+        RowBox[{"Ceiling", "[", 
+         RowBox[{"Last", "[", 
+          RowBox[{"gs", "[", "\"\<PeriodClock\>\"", "]"}], "]"}], "]"}]}]}], 
+      "]"}]}], "\[IndentingNewLine]", "]"}]}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"viewPeriod", "[", 
+   RowBox[{"gs_", "?", "AssociationQ"}], "]"}], ":=", 
+  RowBox[{"viewPeriod", "[", 
+   RowBox[{"gs", "[", "\"\<Period\>\"", "]"}], "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"viewPeriod", "[", "p_Integer", "]"}], ":=", 
+  RowBox[{"StringJoin", "[", 
+   RowBox[{
+    RowBox[{"ToString", "[", "p", "]"}], ",", 
+    RowBox[{"Replace", "[", 
+     RowBox[{"p", ",", "ordinals"}], "]"}], ",", "\"\< \>\"", ",", 
+    RowBox[{"Switch", "[", 
+     RowBox[{
+      RowBox[{"gs", "[", "\"\<PeriodsInGame\>\"", "]"}], ",", "2", ",", 
+      "\"\<Half\>\"", ",", "4", ",", "\"\< Quarter\>\"", ",", "_", ",", 
+      "\"\<Period\>\""}], "]"}]}], "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"viewPeriod", "[", 
+   RowBox[{"Overtime", "[", "1", "]"}], "]"}], ":=", 
+  "\"\<OT\>\""}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"viewPeriod", "[", 
+   RowBox[{"Overtime", "[", "n_", "]"}], "]"}], ":=", 
+  RowBox[{"\"\<OT\>\"", "<>", 
+   RowBox[{"ToString", "[", "n", "]"}]}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"viewPeriod", "[", "Final", "]"}], ":=", "\"\<Final\>\""}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{
+   RowBox[{"ordinals", "=", 
+    RowBox[{"{", 
+     RowBox[{
+      RowBox[{"1", "\[Rule]", "\"\<st\>\""}], ",", 
+      RowBox[{"2", "\[Rule]", "\"\<nd\>\""}], ",", 
+      RowBox[{"3", "\[Rule]", "\"\<rd\>\""}], ",", 
+      RowBox[{"_", "\[Rule]", "\"\<th\>\""}]}], "}"}]}], ";"}], 
+  "\[IndentingNewLine]"}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"viewPlay", "[", 
+   RowBox[{"result", ":", 
+    RowBox[{"KeyValuePattern", "[", 
+     RowBox[{"\"\<Result\>\"", "\[Rule]", 
+      RowBox[{"MissedShot", "[", 
+       RowBox[{"type_", ",", "n_"}], "]"}]}], "]"}]}], "]"}], ":=", 
+  RowBox[{"Row", "[", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"result", "[", "\"\<Team\>\"", "]"}], ",", "\"\<: #\>\"", ",", 
+     "n", ",", "\"\< missed \>\"", ",", 
+     RowBox[{"ToLowerCase", "[", "type", "]"}]}], "}"}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"viewPlay", "[", 
+   RowBox[{"result", ":", 
+    RowBox[{"KeyValuePattern", "[", 
+     RowBox[{"\"\<Result\>\"", "\[Rule]", 
+      RowBox[{"Score", "[", 
+       RowBox[{"type_", ",", "n_"}], "]"}]}], "]"}]}], "]"}], ":=", 
+  RowBox[{"Row", "[", 
+   RowBox[{"{", 
+    RowBox[{
+     RowBox[{"result", "[", "\"\<Team\>\"", "]"}], ",", "\"\<: #\>\"", ",", 
+     "n", ",", "\"\< made \>\"", ",", 
+     RowBox[{"ToLowerCase", "[", "type", "]"}]}], "}"}], 
+   "]"}]}], "\[IndentingNewLine]", 
+ RowBox[{
+  RowBox[{"viewPlay", "[", "other_", "]"}], ":=", "other"}]}], "Input",
+ CellChangeTimes->{{3.787857187835903*^9, 3.787857416587987*^9}, {
+   3.7878576081599445`*^9, 3.7878577831929555`*^9}, {3.7878587152182646`*^9, 
+   3.787858813313875*^9}, 3.787859477467863*^9, {3.7878620551412973`*^9, 
+   3.787862070292164*^9}, {3.787862133832798*^9, 3.787862138532067*^9}, {
+   3.788026717552251*^9, 3.788026802725583*^9}, {3.7880268563807435`*^9, 
+   3.788026931997754*^9}, {3.788027238351082*^9, 3.7880272457280846`*^9}, 
+   3.7880275445125637`*^9, {3.7880294451867447`*^9, 3.788029448646151*^9}},
+ CellLabel->"In[4]:=",ExpressionUUID->"e9a4bdc2-d3a8-4f49-b234-f0193c2851f9"],
+
+Cell[BoxData[
+ DynamicBox[ToBoxes[
+   Grid[{{
+      Dataset[
+       Association[
+       "Away" -> $CellContext`gs["Score", "Away"], 
+        "Home" -> $CellContext`gs["Score", "Home"], 
+        "Clock" -> $CellContext`viewClockAndPeriod[$CellContext`gs], 
+        "Last Play:" -> Replace[
+          $CellContext`gs["PossessionHistory", 
+           $CellContext`gs["Period"]], {{
+             BlankNullSequence[], 
+             Pattern[$CellContext`p, 
+              Blank[]]} :> $CellContext`viewPlay[
+             KeyTake[$CellContext`p, {"Team", "Result"}]], Blank[] :> ""}]]], 
+      SpanFromLeft}, {
+      Row[{
+        Button[
+        "Next Possession", $CellContext`gs = 
+         Basketball`runPossession[$CellContext`gs]], 
+        Button["+10 Possessions", 
+         Do[$CellContext`gs = Basketball`runPossession[$CellContext`gs], {
+          10}]]}], 
+      Button["New Game", $CellContext`gs = Basketball`initialGameState]}}, 
+    Alignment -> Left], StandardForm],
+  ImageSizeCache->{264., {63.5, 69.5}}]], "Output",
+ CellChangeTimes->{
+  3.788026725734063*^9, 3.788026803028742*^9, {3.7880269341648064`*^9, 
+   3.7880269626318755`*^9}, 3.788026995830748*^9, 3.788027268206442*^9, 
+   3.7880275451159177`*^9, 3.7880294496841493`*^9},
+ CellLabel->"Out[5]=",ExpressionUUID->"2f6446a1-8f04-439a-8dae-84b73ce8efdc"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+},
+WindowSize->{782, 950},
+WindowMargins->{{159, Automatic}, {Automatic, 8}},
+FrontEndVersion->"12.0 for Microsoft Windows (64-bit) (April 8, 2019)",
+StyleDefinitions->"Default.nb"
+]
+(* End of Notebook Content *)
+
+(* Internal cache information *)
+(*CellTagsOutline
+CellTagsIndex->{}
+*)
+(*CellTagsIndex
+CellTagsIndex->{}
+*)
+(*NotebookFileOutline
+Notebook[{
+Cell[CellGroupData[{
+Cell[580, 22, 168, 3, 96, "Title",ExpressionUUID->"09627fbd-004d-48a5-a82b-7b1640d10e73"],
+Cell[751, 27, 295, 6, 56, "Text",ExpressionUUID->"39dab510-938a-4068-9b49-7f195bf51254"],
+Cell[CellGroupData[{
+Cell[1071, 37, 183, 3, 31, "Item",ExpressionUUID->"46771aa8-12fd-486f-a4a6-79474bee2f7c"],
+Cell[1257, 42, 266, 4, 31, "Item",ExpressionUUID->"fe793e54-cd3f-401b-a246-d2aafe74008d"],
+Cell[CellGroupData[{
+Cell[1548, 50, 277, 4, 26, "Subitem",ExpressionUUID->"f9b367a5-1ff4-41ef-9585-a94d089f5c8a"],
+Cell[1828, 56, 207, 4, 26, "Subitem",ExpressionUUID->"8a283a2a-feba-4451-960e-ae9d6c33939f"],
+Cell[2038, 62, 186, 3, 26, "Subitem",ExpressionUUID->"e35632a7-c8ff-4e99-9660-f68ccb1a96fa"],
+Cell[2227, 67, 256, 4, 26, "Subitem",ExpressionUUID->"1a3dfb1b-a660-4052-abf7-862ded65e220"]
+}, Open  ]]
+}, Open  ]],
+Cell[2510, 75, 445, 9, 78, "Text",ExpressionUUID->"a52cb317-40fd-4ac1-8f40-40e49fa87fee"],
+Cell[CellGroupData[{
+Cell[2980, 88, 166, 3, 67, "Section",ExpressionUUID->"828ed67b-6b7f-4d43-abd1-c41b53263f97"],
+Cell[3149, 93, 183, 3, 34, "Text",ExpressionUUID->"c57a550f-23bf-480f-a36d-9cdab6d0f5ae"],
+Cell[CellGroupData[{
+Cell[3357, 100, 984, 21, 132, "Input",ExpressionUUID->"c0114508-92c6-45a5-806b-59fe0a466e22"],
+Cell[4344, 123, 729, 16, 41, "Output",ExpressionUUID->"a0d6e07c-c9d0-4053-8c68-88488b31e4dd"]
+}, Open  ]],
+Cell[5088, 142, 521, 9, 78, "Text",ExpressionUUID->"51d97610-3e65-479a-a402-3c978e5dd9c1"],
+Cell[CellGroupData[{
+Cell[5634, 155, 179, 3, 53, "Subsection",ExpressionUUID->"46fd3538-1b93-45aa-8f35-dfc1bb010acc"],
+Cell[5816, 160, 223, 5, 34, "Text",ExpressionUUID->"9359a525-85a9-4146-b62c-baae1397865e"],
+Cell[6042, 167, 363, 7, 56, "Text",ExpressionUUID->"30e25c5d-65ad-4432-9260-e738da3f9615"],
+Cell[6408, 176, 323, 6, 28, "Input",ExpressionUUID->"33348280-705c-4905-a00f-1133ad526ed8"],
+Cell[6734, 184, 543, 10, 34, "Text",ExpressionUUID->"f72c5818-0ba7-42d0-9d22-4b8e4228172b"],
+Cell[7280, 196, 233, 4, 34, "Text",ExpressionUUID->"e79d5412-f192-4479-8b1f-a21f3bb47091"],
+Cell[7516, 202, 279, 6, 28, "Input",ExpressionUUID->"4626798f-4a9d-4a23-a2e9-bcc27bd20da5"],
+Cell[7798, 210, 236, 6, 34, "Text",ExpressionUUID->"7c2cb354-8e74-4c2c-b1e1-96f30161cab1"]
+}, Open  ]]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[8083, 222, 168, 3, 67, "Section",ExpressionUUID->"3e46c7ae-c1d4-4569-8226-13e9c37f9b4c"],
+Cell[8254, 227, 173, 3, 34, "Text",ExpressionUUID->"57dea718-54fd-4bd0-9dc2-7c2af6506d52"],
+Cell[8430, 232, 2031, 39, 219, "Input",ExpressionUUID->"8a0a0570-b58a-487b-8e54-34e093b4fc20"],
+Cell[10464, 273, 492, 9, 78, "Text",ExpressionUUID->"844a7302-4537-4123-b077-0cd8d57334d6"],
+Cell[10959, 284, 541, 12, 78, "Text",ExpressionUUID->"885cc713-165c-4082-86d4-dd2eddf80e36"],
+Cell[11503, 298, 214, 4, 28, "Input",ExpressionUUID->"780c1ce9-65bf-4e5c-b82d-abb3d6ff25bd"],
+Cell[11720, 304, 237, 6, 34, "Text",ExpressionUUID->"ff84d2b5-797d-4519-94b7-402f2cbf93d1"],
+Cell[11960, 312, 279, 6, 56, "Text",ExpressionUUID->"772f606c-4297-4a74-a455-05cffee65db5"],
+Cell[12242, 320, 175, 3, 34, "Text",ExpressionUUID->"ced0dcea-5eca-46ab-94bf-46d8fef5446e"],
+Cell[12420, 325, 1570, 38, 163, "Input",ExpressionUUID->"1d307246-30e1-409d-b6e4-fe1c81290339"]
+}, Open  ]],
+Cell[CellGroupData[{
+Cell[14027, 368, 162, 3, 67, "Section",ExpressionUUID->"17ac04d7-2b75-4b25-adca-12434e40e3af"],
+Cell[14192, 373, 470, 9, 56, "Text",ExpressionUUID->"fc82eacd-4423-4a9b-b26a-58c6924c8151"],
+Cell[14665, 384, 274, 6, 28, "Input",ExpressionUUID->"27e5b2e2-fd87-4c0b-8ae7-86e5c312b1b7"],
+Cell[14942, 392, 186, 3, 34, "Text",ExpressionUUID->"50c5f287-9117-4801-9745-cb7a659dae0a"],
+Cell[15131, 397, 291, 6, 56, "Text",ExpressionUUID->"821fc3e6-c4ee-4de5-b694-b9b876beecd3"],
+Cell[15425, 405, 269, 6, 56, "Text",ExpressionUUID->"ff11f5da-8139-4313-be67-49e25291b274"],
+Cell[15697, 413, 4828, 91, 276, "Input",ExpressionUUID->"deecce42-bfb5-46bd-845a-30fe1368d15b"],
+Cell[20528, 506, 387, 7, 78, "Text",ExpressionUUID->"47cbb70f-6dd6-44f2-b490-274352935bd8"],
+Cell[20918, 515, 4810, 101, 333, "Input",ExpressionUUID->"093c3118-e3ba-4d71-abdf-8986e92ce028"],
+Cell[25731, 618, 409, 8, 56, "Text",ExpressionUUID->"a9112578-ed3b-43af-b478-f32821d468c5"],
+Cell[26143, 628, 2596, 61, 257, "Input",ExpressionUUID->"1c0476e1-53f4-4c52-80b9-3a3c8f1810ab"],
+Cell[28742, 691, 378, 8, 56, "Text",ExpressionUUID->"c9046f9e-a097-4a4d-88c2-6b6fd8f75e54"],
+Cell[29123, 701, 2975, 59, 105, "Input",ExpressionUUID->"f33c127b-862a-445f-b314-a7a0584d84e7"],
+Cell[32101, 762, 358, 8, 56, "Text",ExpressionUUID->"bcd91c0f-f6a7-462a-9fc2-6928ce2d8409"],
+Cell[32462, 772, 1752, 41, 162, "Input",ExpressionUUID->"2c42bfdf-696b-4498-b4aa-6e1cbb790745"],
+Cell[34217, 815, 366, 8, 56, "Text",ExpressionUUID->"910eef16-2c45-4a84-8fee-a2bd1ad460e9"],
+Cell[34586, 825, 1221, 19, 48, "Input",ExpressionUUID->"3de35062-ce17-44fa-8b96-1b4ffbee1d59"],
+Cell[35810, 846, 452, 9, 56, "Text",ExpressionUUID->"b53d3500-7add-420c-8cc6-fd27ba6f8e0d"],
+Cell[CellGroupData[{
+Cell[36287, 859, 7045, 172, 656, "Input",ExpressionUUID->"e9a4bdc2-d3a8-4f49-b234-f0193c2851f9"],
+Cell[43335, 1033, 1323, 30, 152, "Output",ExpressionUUID->"2f6446a1-8f04-439a-8dae-84b73ce8efdc"]
+}, Open  ]]
+}, Open  ]]
+}, Open  ]]
+}
+]
+*)
+
